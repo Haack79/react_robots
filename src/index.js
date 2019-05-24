@@ -1,7 +1,9 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom'; 
 import './index.css';
-import App from './App';
+import App from './containers/App';
+import 'tachyons';
+// have to destructure robots cause importing multiple items rather than just one
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(<App />, document.getElementById('root'));
