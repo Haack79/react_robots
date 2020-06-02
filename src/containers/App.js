@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'; 
 import CardList from '../components/CardList';
 // import { robots } from './robots';
 import SearchBox from '../components/SearchBox';
@@ -7,15 +8,28 @@ import ErrorBoundry from '../components/ErrorBoundry';
 import './App.css';
 // this has state/ and it is a class now that handles state
 // const state = {
-//     robots: robots,
+//     robots: [],
 //     searchfield: ''
 // }
+import { setSearchField } from '../actions.js';
+const mapStateToProps = state => {
+    return {
+        // below is coming from the reducer
+        searchField: state.searchField
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        onSearchChange: (event) => dispatch(setSearchField(event.target.value))
+    }
+}
 class App extends Component {
     constructor() {
         super()
         this.state = {
         robots: [],
-        searchfield: ''
+        // searchfield: '' this is now handled by store in redux state tree. 
         }
     }
 
@@ -25,26 +39,29 @@ class App extends Component {
             .then(response => response.json())
             .then(users => this.setState({robots: users}));
     }
-
-    onSearchChange = (event) => {
-        this.setState({ searchfield: event.target.value })
-        // console.log(event.target.value);
-        // const filteredRobots = this.state.robots.filter(robot => {
-        //     return robot.name.toLowerCase().includes(this.state.searchfield.toLowerCase());
-        // })
-        // console.log(filteredRobots);
-    }
+// Don't Need this onSearchChange cause it's being passed in as props and don't need to declare it as method of App
+    // onSearchChange = (event) => {
+    //     this.setState({ searchfield: event.target.value })
+    //     // console.log(event.target.value);
+    //     // const filteredRobots = this.state.robots.filter(robot => {
+    //     //     return robot.name.toLowerCase().includes(this.state.searchfield.toLowerCase());
+    //     // })
+    //     // console.log(filteredRobots);
+    // }
 
     render() {
-        const filteredRobots = this.state.robots.filter(robot => {
-            return robot.name.toLowerCase().includes(this.state.searchfield.toLowerCase());
+        const { robots } = this.state;
+        // isntead of getting searchField from state of this component, it now comes as prop from redux store.
+        const { searchField, onSearchChange } = this.props;
+        const filteredRobots = robots.filter(robot => {
+            return robot.name.toLowerCase().includes(searchField.toLowerCase());
         })
         return !this.state.robots.length ?
             <h1>Loading...</h1> :
                 (
                 <div className='tc'>
                     <h1 className='f1'>Robo Friends</h1>
-                    <SearchBox searchChange={this.onSearchChange} />
+                    <SearchBox searchChange={onSearchChange} />
                     {/* <CardList robots={this.state.robots} /> */}
                     <Scroll>
                         <ErrorBoundry>
@@ -56,4 +73,4 @@ class App extends Component {
     }
 }
 
-export default App;
+export default connect(mapStateToProps, mapDispatchToProps)(App);
